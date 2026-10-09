@@ -129,6 +129,17 @@ app.post('/api/book', (req, res) => {
 });
 
 // 3. POS App ke liye Bookings List API
+// Update booking status API (CONFIRMED, CANCELLED)
+app.post('/api/booking-status', (req, res) => {
+  const { id, status } = req.body;
+  const item = bookings.find(b => b.id == id);
+  if (item) {
+    item.status = status;
+    saveBackup();
+    return res.json({ success: true, booking: item });
+  }
+  res.status(404).json({ error: 'Booking not found' });
+});
 app.get('/api/bookings', (req, res) => {
   res.json(bookings);
 });
@@ -236,3 +247,4 @@ app.get('/invoice/:id', (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
