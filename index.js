@@ -39,7 +39,7 @@ if (process.env.DATABASE_URL) {
 }
 
 // 1. Online Booking Form Webpage (Customer WhatsApp par yahi kholega)
-app.get('/book', (req, res) => {
+app.get(['/', '/book'], (req, res) => {
   res.send(`
 <!DOCTYPE html>
 <html>
@@ -381,5 +381,6 @@ app.get('/invoice/:id', (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
 
 
