@@ -25,7 +25,7 @@ function saveData(data) {
   } catch (e) {}
 }
 
-// 1. ONLINE BOOKING WEBPAGE (ROOT & /book BOTH)
+// 1. ONLINE BOOKING WEBPAGE
 app.get(['/', '/book'], (req, res) => {
   res.send(`<!DOCTYPE html>
 <html lang="en">
@@ -36,28 +36,28 @@ app.get(['/', '/book'], (req, res) => {
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { background: #f1f5f9; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-    .card { background: #ffffff; width: 100%; max-width: 480px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); padding: 28px; }
-    .header { text-align: center; margin-bottom: 22px; }
+    .card { background: #ffffff; width: 100%; max-width: 500px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); padding: 28px; }
+    .header { text-align: center; margin-bottom: 20px; }
     .header h1 { font-size: 22px; color: #0f766e; font-weight: 700; margin-bottom: 4px; }
     .header p { font-size: 12px; color: #64748b; }
-    .form-group { margin-bottom: 16px; }
+    .form-group { margin-bottom: 14px; }
     label { display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px; }
     input[type="text"], input[type="tel"], input[type="datetime-local"] {
-      width: 100%; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 14px; outline: none; transition: 0.2s;
+      width: 100%; padding: 10px 14px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 14px; outline: none;
     }
     input:focus { border-color: #0f766e; }
     
-    #selectedServicesBox { display: none; background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 12px; margin-bottom: 12px; }
+    #selectedServicesBox { display: none; background: #f8fafc; border: 1.5px solid #0f766e; border-radius: 10px; padding: 10px; margin-bottom: 10px; }
     .sel-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 13px; }
-    .btn-qty { width: 24px; height: 24px; border-radius: 4px; border: none; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-qty { width: 24px; height: 24px; border-radius: 4px; border: none; font-weight: bold; cursor: pointer; }
     .btn-minus { background: #fee2e2; color: #dc2626; }
     .btn-plus { background: #e0e7ff; color: #4f46e5; }
     
-    #catalogBox { max-height: 190px; overflow-y: auto; border: 1.5px solid #cbd5e1; border-radius: 10px; background: #fff; padding: 4px; }
-    .cat-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-bottom: 1px solid #f1f5f9; }
+    #catalogBox { max-height: 180px; overflow-y: auto; border: 1.5px solid #cbd5e1; border-radius: 10px; background: #fff; padding: 4px; }
+    .cat-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; border-bottom: 1px solid #f1f5f9; }
     .btn-add { background: #e6fffa; color: #0d9488; border: 1px solid #99f6e4; border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: bold; cursor: pointer; }
     
-    .btn-submit { width: 100%; background: #0f766e; color: white; padding: 13px; border: none; border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 10px; }
+    .btn-submit { width: 100%; background: #0f766e; color: white; padding: 13px; border: none; border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; }
     .btn-submit:hover { background: #115e59; }
     .success-card { display: none; text-align: center; padding: 20px 0; }
     .success-card h2 { color: #0f766e; margin-bottom: 8px; font-size: 20px; }
@@ -82,13 +82,12 @@ app.get(['/', '/book'], (req, res) => {
       </div>
 
       <div class="form-group">
-        <label>Preferred Services (Add Services & Multi-Quantity)</label>
+        <label>Preferred Services (Choose & Add Quantity)</label>
         <input type="hidden" id="service" required>
-        
-        <input type="text" id="searchService" placeholder="🔍 Type to search (e.g. Makeup, Facial, Haircut)..." oninput="filterCatalog()" style="margin-bottom: 8px;">
+        <input type="text" id="searchService" placeholder="🔍 Type to search service..." oninput="filterCatalog()" style="margin-bottom: 8px;">
 
         <div id="selectedServicesBox">
-          <div style="font-size: 11px; font-weight: bold; color: #64748b; margin-bottom: 8px;">SELECTED SERVICES:</div>
+          <div style="font-size: 11px; font-weight: bold; color: #0f766e; margin-bottom: 6px;">SELECTED SERVICES:</div>
           <div id="selectedList"></div>
         </div>
 
@@ -105,7 +104,7 @@ app.get(['/', '/book'], (req, res) => {
 
     <div class="success-card" id="successBox">
       <h2>🎉 Appointment Received!</h2>
-      <p style="color: #475569; font-size: 14px; margin-bottom: 8px;">Thank you! Your appointment request has been forwarded to <b>Sakshi Makeover & Unisex Salon</b>.</p>
+      <p style="color: #475569; font-size: 14px; margin-bottom: 8px;">Thank you! Your booking request has been forwarded to <b>Sakshi Makeover & Unisex Salon</b>.</p>
       <p style="color: #64748b; font-size: 12px;">We look forward to seeing you!</p>
     </div>
   </div>
@@ -147,7 +146,7 @@ app.get(['/', '/book'], (req, res) => {
       const box = document.getElementById('catalogBox');
       box.innerHTML = '';
       if (items.length === 0) {
-        box.innerHTML = '<div style="padding: 12px; color: #94a3b8; text-align: center; font-size: 12px;">Koi service nahi mili</div>';
+        box.innerHTML = '<div style="padding: 10px; color: #94a3b8; text-align: center; font-size: 12px;">Koi service nahi mili</div>';
         return;
       }
       items.forEach(it => {
@@ -225,20 +224,21 @@ app.get(['/', '/book'], (req, res) => {
 
     document.getElementById('bookForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const serviceVal = document.getElementById('service').value;
-      if (!serviceVal) {
-        alert('Kripya kam se kam ek service select karein!');
+      const sVal = document.getElementById('service').value;
+      if (!sVal) {
+        alert('Kripya catalog me se kam se kam ek service Add karein!');
         return;
       }
-      const payload = {
-        name: document.getElementById('name').value,
-        phone: document.getElementById('phone').value,
-        service: serviceVal,
-        time: document.getElementById('time').value
-      };
       const btn = document.getElementById('submitBtn');
       btn.innerText = 'Submitting...';
       btn.disabled = true;
+
+      const payload = {
+        name: document.getElementById('name').value,
+        phone: document.getElementById('phone').value,
+        service: sVal,
+        time: document.getElementById('time').value
+      };
 
       try {
         const res = await fetch('/api/book', {
@@ -250,7 +250,7 @@ app.get(['/', '/book'], (req, res) => {
           document.getElementById('bookForm').style.display = 'none';
           document.getElementById('successBox').style.display = 'block';
         } else {
-          alert('Error booking appointment.');
+          alert('Booking error! Please try again.');
           btn.innerText = 'Confirm Appointment 📅';
           btn.disabled = false;
         }
@@ -265,7 +265,7 @@ app.get(['/', '/book'], (req, res) => {
 </html>`);
 });
 
-// 2. APIS
+// 2. BACKEND APIS
 app.post('/api/book', (req, res) => {
   const { name, phone, service, time } = req.body;
   if (!name || !phone || !service || !time) {
