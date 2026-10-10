@@ -73,8 +73,20 @@ app.get('/book', (req, res) => {
       <label>WhatsApp Number</label>
       <input type="tel" id="phone" required placeholder="10-digit mobile number">
 
-      <label>Preferred Service</label>
-      <input type="text" id="service" required placeholder="e.g. Haircut, Facial, Keratin">
+      <label style="display:block; margin-bottom: 6px; font-weight: bold; color: #1e293b;">Preferred Services (Add Services & Quantity)</label>
+          <input type="hidden" id="service" required>
+          
+          <!-- SEARCH BOX -->
+          <input type="text" id="serviceSearch" placeholder="🔍 Type to search service (e.g. Makeup, Facial, Waxing)..." oninput="filterServices()" style="margin-bottom: 8px;">
+
+          <!-- SELECTED SERVICES DISPLAY -->
+          <div id="selectedServicesContainer" style="display: none; background: #f1f5f9; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; margin-bottom: 10px;">
+            <div style="font-size: 11px; font-weight: bold; color: #475569; margin-bottom: 6px; letter-spacing: 0.5px;">SELECTED SERVICES:</div>
+            <div id="selectedServicesList"></div>
+          </div>
+
+          <!-- SERVICES CATALOG LIST -->
+          <div id="catalogList" style="max-height: 180px; overflow-y: auto; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 4px; background: #fff; margin-bottom: 14px;"></div>
 
       <label>Preferred Date & Time</label>
       <input type="datetime-local" id="time" required>
@@ -88,6 +100,128 @@ app.get('/book', (req, res) => {
     <p style="font-size: 12px; color: #64748b;">We look forward to seeing you!</p>
   </div>
   <script>
+const salonServices = [
+        // Men's Grooming
+        { name: "Haircut (Men)", cat: "Men's Grooming", price: 120 },
+        { name: "Clean Shave", cat: "Men's Grooming", price: 60 },
+        { name: "Beard Trim & Styling", cat: "Men's Grooming", price: 80 },
+        { name: "Head Massage (Oil)", cat: "Men's Grooming", price: 150 },
+        
+        // Thread Work & Waxing
+        { name: "Threading (Eyebrows)", cat: "Thread Work", price: 30 },
+        { name: "Upper Lip Threading", cat: "Thread Work", price: 20 },
+        { name: "Full Face Wax", cat: "Waxing", price: 250 },
+        { name: "Underarms Wax (Normal)", cat: "Waxing", price: 60 },
+        { name: "Full Arms Wax (RICA)", cat: "Waxing", price: 350 },
+        { name: "Full Legs Wax (RICA)", cat: "Waxing", price: 600 },
+        
+        // Clean-Up & Facial
+        { name: "Fruit Clean-Up", cat: "Clean-Up", price: 299 },
+        { name: "D-Tan Clean-Up", cat: "Clean-Up", price: 399 },
+        { name: "Fruit Facial", cat: "Facial", price: 499 },
+        { name: "Gold Radiance Facial", cat: "Facial", price: 799 },
+        { name: "O3+ Bridal Glow Facial", cat: "Facial", price: 1499 },
+        
+        // Makeup & Styling
+        { name: "Party Makeup", cat: "Makeup & Styling", price: 2000 },
+        { name: "Engagement Makeup", cat: "Makeup & Styling", price: 4500 },
+        { name: "Bridal Makeup", cat: "Makeup & Styling", price: 15000 },
+        { name: "Reception Makeup", cat: "Makeup & Styling", price: 6000 },
+        { name: "Hair Styling / Curls / Bun", cat: "Makeup & Styling", price: 500 },
+        { name: "Saree / Dupatta Draping", cat: "Makeup & Styling", price: 300 },
+        
+        // Hair Treatments & Color
+        { name: "Root Touch-Up", cat: "Hair Colour", price: 600 },
+        { name: "Global Hair Color", cat: "Hair Colour", price: 1800 },
+        { name: "Hair Spa (L'Oreal)", cat: "Hair Spa", price: 599 },
+        { name: "Keratin Treatment", cat: "Hair Treatments", price: 2999 },
+        { name: "Rebonding / Smoothening", cat: "Hair Treatments", price: 3499 },
+        { name: "Botox Hair Treatment", cat: "Hair Treatments", price: 3999 }
+      ];
+
+      const selectedMap = {};
+
+      function renderCatalog(items) {
+        const list = document.getElementById('catalogList');
+        if (!list) return;
+        list.innerHTML = '';
+        if (items.length === 0) {
+          list.innerHTML = '<div style="padding: 10px; color: #94a3b8; text-align: center; font-size: 12px;">Koi service match nahi hui</div>';
+          return;
+        }
+        items.forEach(it => {
+          const qty = selectedMap[it.name] || 0;
+          const row = document.createElement('div');
+          row.style = 'display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; border-bottom: 1px solid #f1f5f9;';
+          row.innerHTML = `
+            <div>
+              <div style="font-weight: 600; font-size: 13px; color: #1e293b;">${it.name}</div>
+              <div style="font-size: 11px; color: #64748b;">${it.cat} • Rs. ${it.price}</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              ${qty > 0 ? `<span style="background: #4f46e5; color: white; border-radius: 4px; padding: 2px 6px; font-size: 10px; font-weight: bold;">${qty}</span>` : ''}
+              <button type="button" onclick="addService('${it.name}')" style="background: #eef2ff; color: #4f46e5; border: 1px solid #c7d2fe; border-radius: 6px; padding: 3px 8px; font-size: 11px; cursor: pointer; font-weight: bold;">+ Add</button>
+            </div>
+          `;
+          list.appendChild(row);
+        });
+      }
+
+      function updateSelectedUI() {
+        const box = document.getElementById('selectedServicesContainer');
+        const list = document.getElementById('selectedServicesList');
+        if (!box || !list) return;
+        list.innerHTML = '';
+        const keys = Object.keys(selectedMap);
+        
+        if (keys.length === 0) {
+          box.style.display = 'none';
+          document.getElementById('service').value = '';
+          return;
+        }
+        
+        box.style.display = 'block';
+        keys.forEach(k => {
+          const qty = selectedMap[k];
+          const div = document.createElement('div');
+          div.style = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 13px;';
+          div.innerHTML = `
+            <span style="font-weight: 600; color: #0f172a;">${k}</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button type="button" onclick="removeService('${k}')" style="background: #fee2e2; color: #dc2626; border: none; border-radius: 4px; width: 22px; height: 22px; cursor: pointer; font-weight: bold;">-</button>
+              <span style="font-weight: bold; color: #4f46e5;">${qty}</span>
+              <button type="button" onclick="addService('${k}')" style="background: #e0e7ff; color: #4f46e5; border: none; border-radius: 4px; width: 22px; height: 22px; cursor: pointer; font-weight: bold;">+</button>
+            </div>
+          `;
+          list.appendChild(div);
+        });
+
+        document.getElementById('service').value = keys.map(k => selectedMap[k] > 1 ? `${k} x ${selectedMap[k]}` : k).join(', ');
+      }
+
+      window.addService = function(name) {
+        selectedMap[name] = (selectedMap[name] || 0) + 1;
+        updateSelectedUI();
+        filterServices();
+      };
+
+      window.removeService = function(name) {
+        if (selectedMap[name] > 1) {
+          selectedMap[name]--;
+        } else {
+          delete selectedMap[name];
+        }
+        updateSelectedUI();
+        filterServices();
+      };
+
+      window.filterServices = function() {
+        const q = (document.getElementById('serviceSearch').value || '').toLowerCase().trim();
+        const f = salonServices.filter(s => s.name.toLowerCase().includes(q) || s.cat.toLowerCase().includes(q));
+        renderCatalog(f);
+      };
+
+      setTimeout(() => { renderCatalog(salonServices); }, 100);
     document.getElementById('bookForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const payload = {
