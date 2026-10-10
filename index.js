@@ -47,7 +47,6 @@ app.get(['/', '/book'], (req, res) => {
     }
     input:focus { border-color: #0f766e; }
     
-    /* SERVICES CATALOG STYLES */
     #selectedServicesBox { display: none; background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 12px; margin-bottom: 12px; }
     .sel-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 13px; }
     .btn-qty { width: 24px; height: 24px; border-radius: 4px; border: none; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
@@ -88,13 +87,11 @@ app.get(['/', '/book'], (req, res) => {
         
         <input type="text" id="searchService" placeholder="🔍 Type to search (e.g. Makeup, Facial, Haircut)..." oninput="filterCatalog()" style="margin-bottom: 8px;">
 
-        <!-- SELECTED COUNTER VIEW -->
         <div id="selectedServicesBox">
           <div style="font-size: 11px; font-weight: bold; color: #64748b; margin-bottom: 8px;">SELECTED SERVICES:</div>
           <div id="selectedList"></div>
         </div>
 
-        <!-- LIVE CATALOG LIST -->
         <div id="catalogBox"></div>
       </div>
 
@@ -115,36 +112,27 @@ app.get(['/', '/book'], (req, res) => {
 
   <script>
     const salonCatalog = [
-      // Men's Grooming
       { name: "Haircut (Men)", cat: "Men's Grooming", price: 120 },
       { name: "Clean Shave", cat: "Men's Grooming", price: 60 },
       { name: "Beard Trim & Styling", cat: "Men's Grooming", price: 80 },
       { name: "Head Massage (Oil)", cat: "Men's Grooming", price: 150 },
-      
-      // Threading & Waxing
       { name: "Threading (Eyebrows)", cat: "Thread Work", price: 30 },
       { name: "Upper Lip Threading", cat: "Thread Work", price: 20 },
       { name: "Full Face Wax", cat: "Waxing", price: 250 },
       { name: "Underarms Wax (Normal)", cat: "Waxing", price: 60 },
       { name: "Full Arms Wax (RICA)", cat: "Waxing", price: 350 },
       { name: "Full Legs Wax (RICA)", cat: "Waxing", price: 600 },
-      
-      // Clean-Up & Facial
       { name: "Fruit Clean-Up", cat: "Clean-Up", price: 299 },
       { name: "D-Tan Clean-Up", cat: "Clean-Up", price: 399 },
       { name: "Fruit Facial", cat: "Facial", price: 499 },
       { name: "Gold Radiance Facial", cat: "Facial", price: 799 },
       { name: "O3+ Bridal Glow Facial", cat: "Facial", price: 1499 },
-      
-      // Makeup & Styling
       { name: "Party Makeup", cat: "Makeup & Styling", price: 2000 },
       { name: "Engagement Makeup", cat: "Makeup & Styling", price: 4500 },
       { name: "Bridal Makeup", cat: "Makeup & Styling", price: 15000 },
       { name: "Reception Makeup", cat: "Makeup & Styling", price: 6000 },
       { name: "Hair Styling / Curls / Bun", cat: "Makeup & Styling", price: 500 },
       { name: "Saree / Dupatta Draping", cat: "Makeup & Styling", price: 300 },
-      
-      // Hair Treatments & Color
       { name: "Root Touch-Up", cat: "Hair Colour", price: 600 },
       { name: "Global Hair Color", cat: "Hair Colour", price: 1800 },
       { name: "Hair Spa (L'Oreal)", cat: "Hair Spa", price: 599 },
@@ -262,12 +250,12 @@ app.get(['/', '/book'], (req, res) => {
           document.getElementById('bookForm').style.display = 'none';
           document.getElementById('successBox').style.display = 'block';
         } else {
-          alert('Error booking appointment. Please try again.');
+          alert('Error booking appointment.');
           btn.innerText = 'Confirm Appointment 📅';
           btn.disabled = false;
         }
       } catch (err) {
-        alert('Server unreachable. Please check connection.');
+        alert('Server unreachable.');
         btn.innerText = 'Confirm Appointment 📅';
         btn.disabled = false;
       }
